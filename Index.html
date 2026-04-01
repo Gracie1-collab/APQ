@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your AI Pathway — Personalised Discovery Assessment</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0f0e0c;
+    --paper: #f5f0e8;
+    --cream: #ede7d9;
+    --accent: #b8420a;
+    --accent2: #2d5a3d;
+    --gold: #c9952a;
+    --muted: #7a7468;
+    --border: #d4cfc5;
+    --white: #ffffff;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Instrument Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .shell {
+    position: relative;
+    z-index: 1;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  /* MASTHEAD */
+  .masthead {
+    border-top: 3px solid var(--ink);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 0;
+    margin-bottom: 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .masthead-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .masthead-vol {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  /* SCREENS */
+  #screen-quiz, #screen-result { display: none; }
+
+  /* INTRO */
+  .hero-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 14px;
+  }
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 2.8rem);
+    line-height: 1.12;
+    margin-bottom: 20px;
+  }
+  .hero-title em { font-style: italic; color: var(--accent); }
+  .hero-body {
+    font-size: 15px;
+    line-height: 1.78;
+    color: #3a3730;
+    max-width: 600px;
+    margin-bottom: 32px;
+  }
+
+  .meta-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-bottom: 36px;
+  }
+  .meta-item {
+    background: var(--paper);
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .meta-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .meta-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    padding: 14px 28px;
+    cursor: pointer;
+    letter-spacing: 0.03em;
+    transition: background 0.18s, transform 0.12s;
+  }
+  .btn-primary:hover { background: var(--accent); transform: translateY(-1px); }
+
+  /* QUIZ */
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .progress-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .progress-count {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--ink);
+  }
+  .progress-bar {
+    height: 2px;
+    background: var(--border);
+    margin-bottom: 40px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    transition: width 0.4s ease;
+  }
+
+  .q-section {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: 10px;
+  }
+  .q-text {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.1rem, 3vw, 1.3rem);
+    line-height: 1.45;
+    color: var(--ink);
+    margin-bottom: 24px;
+  }
+
+  .options-list { display: grid; gap: 8px; }
+
+  .opt-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    background: var(--white);
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .opt-item:hover { border-color: var(--ink); }
+  .opt-item.selected {
+    border-color: var(--accent);
+    background: #fdf6ef;
+  }
+  .opt-letter {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    min-width: 16px;
+    padding-top: 2px;
+  }
+  .opt-content { flex: 1; }
+  .opt-label { font-size: 14px; line-height: 1.5; color: var(--ink); }
+  .opt-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* Open text question */
+  .open-textarea {
+    width: 100%;
+    border: 1px solid var(--border);
+    background: var(--white);
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--ink);
+    padding: 16px;
+    resize: vertical;
+    min-height: 120px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .open-textarea:focus { border-color: var(--ink); }
+  .open-textarea::placeholder { color: var(--muted); }
+
+  .nav-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+  .btn-ghost {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 13px;
+    padding: 10px 18px;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .btn-ghost:hover:not(:disabled) { border-color: var(--ink); color: var(--ink); }
+  .btn-ghost:disabled { opacity: 0.3; cursor: not-allowed; }
+  .btn-next {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    padding: 11px 22px;
+    cursor: pointer;
+    transition: background 0.15s;
+    opacity: 0.4;
+    pointer-events: none;
+  }
+  .btn-next.active { opacity: 1; pointer-events: all; }
+  .btn-next.active:hover { background: var(--accent); }
+
+  /* RESULT */
+  .result-header { margin-bottom: 36px; }
+  .result-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+  .result-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
+    line-height: 1.15;
+    margin-bottom: 12px;
+  }
+  .result-title em { font-style: italic; color: var(--accent); }
+
+  .readiness-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+  .readiness-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .readiness-bar {
+    flex: 1;
+    height: 3px;
+    background: var(--border);
+  }
+  .readiness-fill {
+    height: 100%;
+    background: var(--accent2);
+    width: 0%;
+    transition: width 1s ease;
+  }
+  .readiness-score {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+
+  .profile-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-bottom: 28px;
+  }
+  .profile-card {
+    background: var(--paper);
+    padding: 14px 16px;
+  }
+  .profile-card-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 5px;
+  }
+  .profile-card-value {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.4;
+  }
+
+  .specialty-block {
+    border: 1.5px solid var(--ink);
+    padding: 24px;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .specialty-block::before {
+    content: 'Primary AI Specialty';
+    position: absolute;
+    top: -10px;
+    left: 16px;
+    background: var(--paper);
+    padding: 0 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .specialty-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-style: italic;
+    margin-bottom: 10px;
+  }
+  .specialty-why {
+    font-size: 13.5px;
+    line-height: 1.65;
+    color: #3a3730;
+  }
+
+  .secondary-block {
+    border: 1px solid var(--border);
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    background: var(--white);
+  }
+  .secondary-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .secondary-name {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: var(--ink);
+  }
+  .secondary-why { font-size: 13px; color: var(--muted); line-height: 1.55; }
+
+  .curriculum-section {
+    margin-top: 36px;
+    border-top: 1px solid var(--border);
+    padding-top: 32px;
+  }
+  .section-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: 4px;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    margin-bottom: 24px;
+    color: var(--ink);
+  }
+
+  .month-block { margin-bottom: 28px; }
+  .month-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .month-pill {
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+  }
+  .month-theme { font-size: 13px; font-weight: 600; color: var(--ink); }
+  .month-focus { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; }
+  .week-list {
+    list-style: none;
+    border-left: 2px solid var(--cream);
+    padding-left: 16px;
+  }
+  .week-item {
+    display: flex;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--cream);
+    font-size: 13.5px;
+    line-height: 1.5;
+  }
+  .week-item:last-child { border-bottom: none; }
+  .week-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    min-width: 42px;
+    padding-top: 2px;
+  }
+  .week-content strong { display: block; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+  .week-content span { color: var(--muted); font-size: 12.5px; }
+  .deliverable-row { display: flex; gap: 8px; align-items: flex-start; margin-top: 5px; }
+  .deliverable-tag {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    padding: 2px 7px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .deliverable-text { font-size: 12px; color: #3a3730; }
+
+  .outcomes-list { display: grid; gap: 10px; margin-top: 16px; }
+  .outcome-item { display: flex; gap: 10px; align-items: flex-start; font-size: 13.5px; line-height: 1.5; }
+  .outcome-dot { width: 6px; height: 6px; min-width: 6px; background: var(--accent); margin-top: 7px; }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+
+  /* WHATSAPP BUTTON */
+  .wa-section {
+    background: var(--cream);
+    border: 1.5px solid var(--ink);
+    padding: 24px;
+    margin-top: 36px;
+  }
+  .wa-section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .wa-section p {
+    font-size: 13.5px;
+    line-height: 1.65;
+    color: #3a3730;
+    margin-bottom: 18px;
+  }
+  .btn-whatsapp {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #25D366;
+    color: white;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    padding: 14px 24px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s, transform 0.12s;
+  }
+  .btn-whatsapp:hover { background: #1ebe5d; transform: translateY(-1px); }
+
+  .btn-restart {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: 1.5px solid var(--border);
+    color: var(--muted);
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 10px 20px;
+    cursor: pointer;
+    margin-top: 12px;
+    transition: all 0.15s;
+  }
+  .btn-restart:hover { border-color: var(--ink); color: var(--ink); }
+
+  .print-hint {
+    margin-top: 10px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .fade-up { animation: fadeUp 0.4s ease forwards; }
+
+  @media (max-width: 560px) {
+    .meta-strip { grid-template-columns: repeat(2, 1fr); }
+    .profile-grid { grid-template-columns: 1fr; }
+  }
+
+  @media print {
+    body { background: white; }
+    body::before { display: none; }
+    .btn-primary, .btn-restart, .btn-whatsapp, .wa-section, .nav-row, .print-hint { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <div class="masthead">
+    <span class="masthead-title">AI Pathway Discovery — Personalised Assessment</span>
+    <span class="masthead-vol">Vol. 1 · 2025</span>
+  </div>
+
+  <!-- INTRO SCREEN -->
+  <div id="screen-intro">
+    <p class="hero-label">Before we begin</p>
+    <h1 class="hero-title">Discover your <em>exact</em> place in the AI era</h1>
+    <p class="hero-body">
+      This is not a knowledge test — it is a discovery conversation. Your answers will reveal how you think, what you already know, and what matters to you professionally. The result is a personalised AI specialty recommendation and a 12-week curriculum designed entirely around you.
+    </p>
+
+    <div class="meta-strip">
+      <div class="meta-item">
+        <span class="meta-label">Questions</span>
+        <span class="meta-value">12</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Time</span>
+        <span class="meta-value">~8 mins</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Output</span>
+        <span class="meta-value">Profile + Curriculum</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Format</span>
+        <span class="meta-value">Sundays · 3 months</span>
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="startQuiz()">
+      Begin Assessment
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+
+  <!-- QUIZ SCREEN -->
+  <div id="screen-quiz">
+    <div class="progress-header">
+      <span class="progress-label">Progress</span>
+      <span class="progress-count" id="progress-count">1 of 12</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill" style="width: 8%"></div>
+    </div>
+    <div id="question-container" class="fade-up"></div>
+    <div class="nav-row">
+      <button class="btn-ghost" id="btn-back" onclick="prevQuestion()" disabled>← Back</button>
+      <button class="btn-next" id="btn-next" onclick="nextQuestion()">
+        Next <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- RESULT SCREEN -->
+  <div id="screen-result"></div>
+
+</div>
+
+<script>
+// ─── REPLACE THIS WITH YOUR WHATSAPP NUMBER (with country code, no +) ───
+const WA_NUMBER = "2349019887664";
+
+const questions = [
+  {
+    section: "Professional Identity",
+    text: "How would you describe your primary role in the academic world right now?",
+    type: "choice",
+    options: [
+      { label: "I produce and publish research — that is my core identity.", sub: "Researcher & scholar", tags: ["research"] },
+      { label: "I teach and shape how others think — the classroom is my stage.", sub: "Educator & mentor", tags: ["consulting", "content"] },
+      { label: "I advise and consult — institutions, policies, programmes.", sub: "Advisor & strategist", tags: ["consulting"] },
+      { label: "I write and communicate ideas — to broad audiences, not just colleagues.", sub: "Public intellectual", tags: ["content"] }
+    ]
+  },
+  {
+    section: "Professional Identity",
+    text: "When you think about the next 5–10 years of your career, which outcome would feel most meaningful?",
+    type: "choice",
+    options: [
+      { label: "Being recognised as the go-to expert on AI for research and academia in my field.", sub: "Academic authority", tags: ["research"] },
+      { label: "Consulting for institutions, companies, or governments on how to actually use AI.", sub: "Consulting legacy", tags: ["consulting"] },
+      { label: "Having a public voice — writing, speaking, shaping the conversation about AI and society.", sub: "Public voice", tags: ["content"] },
+      { label: "Training and equipping the next generation of professionals to navigate AI.", sub: "Educator & trainer", tags: ["consulting", "content"] }
+    ]
+  },
+  {
+    section: "Core Strengths",
+    text: "As a sociologist, which of these has always come most naturally to you?",
+    type: "choice",
+    options: [
+      { label: "Designing rigorous studies — asking the right questions, structuring credible methodology.", sub: "Research design", tags: ["research"] },
+      { label: "Reading systems — how institutions, people and power actually interact.", sub: "Structural analysis", tags: ["consulting", "research"] },
+      { label: "Translating complexity — making hard ideas accessible to ordinary people.", sub: "Communication", tags: ["content", "consulting"] },
+      { label: "Synthesising large bodies of knowledge into clear, actionable insight.", sub: "Synthesis & strategy", tags: ["research", "consulting"] }
+    ]
+  },
+  {
+    section: "Core Strengths",
+    text: "If a major organisation called you tomorrow and said 'we need your expertise' — what would they most likely want?",
+    type: "choice",
+    options: [
+      { label: "To design or review a research framework or evaluation methodology.", sub: "Research expertise", tags: ["research"] },
+      { label: "To diagnose what's going wrong internally and recommend change.", sub: "Consulting expertise", tags: ["consulting"] },
+      { label: "To write, speak, or produce content that communicates complex ideas.", sub: "Communication expertise", tags: ["content"] },
+      { label: "To train their staff on a new way of thinking or working.", sub: "Training expertise", tags: ["consulting", "content"] }
+    ]
+  },
+  {
+    section: "Technology Relationship",
+    text: "How would you honestly describe your relationship with digital technology right now?",
+    type: "choice",
+    options: [
+      { label: "I use what I must — email, Word, Google Scholar. Functional but not enthusiastic.", sub: "Pragmatic user", tags: ["beginner"] },
+      { label: "I'm comfortable but selective — I adopt tools when I have a real reason to.", sub: "Deliberate adopter", tags: ["intermediate"] },
+      { label: "I pick things up quickly once I commit to learning them.", sub: "Fast learner", tags: ["intermediate", "fast-learner"] },
+      { label: "I actively explore new tools and often end up showing others.", sub: "Early explorer", tags: ["advanced"] }
+    ]
+  },
+  {
+    section: "Technology Relationship",
+    text: "Have you used any AI tool — even briefly — in the past 6 months? (ChatGPT, Gemini, Grammarly AI, etc.)",
+    type: "choice",
+    options: [
+      { label: "No — I haven't tried any yet.", sub: "Starting fresh", tags: ["no-prior-ai"] },
+      { label: "I tried one briefly but didn't continue.", sub: "Curious beginner", tags: ["low-prior-ai"] },
+      { label: "Yes — occasionally for specific tasks.", sub: "Occasional user", tags: ["some-prior-ai"] },
+      { label: "Yes — fairly regularly as part of my work.", sub: "Regular user", tags: ["strong-prior-ai"] }
+    ]
+  },
+  {
+    section: "Goals & Sustainability",
+    text: "When you say you want 'sustenance' from your AI skills — what does that mean most concretely to you?",
+    type: "choice",
+    options: [
+      { label: "A reliable consulting income that supplements or eventually replaces my salary.", sub: "Consulting income", tags: ["consulting"] },
+      { label: "Recognition and influence — being sought out, cited, invited.", sub: "Status & influence", tags: ["research", "content"] },
+      { label: "A digital asset or product that generates income without my daily presence.", sub: "Passive income", tags: ["content", "tools"] },
+      { label: "The ability to offer formal training — workshops, short courses, seminars.", sub: "Training income", tags: ["consulting", "content"] }
+    ]
+  },
+  {
+    section: "Goals & Sustainability",
+    text: "Which of these are you willing to do consistently — not just once — over the next 90 days?",
+    type: "choice",
+    options: [
+      { label: "Write and publish ideas publicly — LinkedIn, short articles, opinion pieces.", sub: "Public publishing", tags: ["content"] },
+      { label: "Have paid advisory conversations with real institutions or individuals.", sub: "Advisory work", tags: ["consulting"] },
+      { label: "Build and deploy AI tools in my own research and workflow — visibly.", sub: "AI practice in research", tags: ["research", "tools"] },
+      { label: "Design and deliver structured training to others — colleagues, organisations.", sub: "Teaching & training", tags: ["consulting", "content"] }
+    ]
+  },
+  {
+    section: "Learning Style",
+    text: "You learn something new best when…",
+    type: "choice",
+    options: [
+      { label: "I understand the theory and conceptual logic first before I try anything.", sub: "Conceptual learner", tags: ["research", "systematic"] },
+      { label: "I can apply it immediately to a real problem I actually care about.", sub: "Applied learner", tags: ["consulting", "tools"] },
+      { label: "I see an example, then try to replicate and adapt it myself.", sub: "Observational learner", tags: ["content", "tools"] },
+      { label: "Someone guides me step-by-step and checks in on my understanding.", sub: "Guided learner", tags: ["structured"] }
+    ]
+  },
+  {
+    section: "Learning Style",
+    text: "Outside of our Sunday sessions, how much time per week could you realistically commit?",
+    type: "choice",
+    options: [
+      { label: "Almost none — Sundays will be my primary time.", sub: "Minimal", tags: ["low-bandwidth"] },
+      { label: "1–2 focused hours during the week, if tasks are specific.", sub: "Moderate", tags: ["medium-bandwidth"] },
+      { label: "3–5 hours — I am genuinely committed to this.", sub: "High", tags: ["high-bandwidth"] },
+      { label: "Variable — depends on what needs doing that week.", sub: "Flexible", tags: ["medium-bandwidth"] }
+    ]
+  },
+  {
+    section: "Identity & Vision",
+    text: "Which of these would you be proud to be publicly known for within the next 12 months?",
+    type: "choice",
+    options: [
+      { label: "The sociologist who shows other researchers how AI transforms academic work.", sub: "AI Research Strategist", tags: ["research"] },
+      { label: "The consultant who helps institutions actually implement AI — not just discuss it.", sub: "AI Transformation Consultant", tags: ["consulting"] },
+      { label: "The social scientist with a public voice on AI's impact on society and people.", sub: "AI Public Intellectual", tags: ["content"] },
+      { label: "The expert who trains professionals to use AI properly and get real results.", sub: "AI Skills Trainer", tags: ["consulting", "content"] }
+    ]
+  },
+  {
+    section: "Open Reflection",
+    text: "In your own words — what is the one thing you are most hoping AI will help you do or become? There is no wrong answer.",
+    type: "open",
+    placeholder: "Take your time. Write whatever comes honestly to mind..."
+  }
+];
+
+let current = 0;
+let answers = new Array(questions.length).fill(null);
+
+const specialtyMap = {
+  research: {
+    name: "AI Research Strategist",
+    short: "AI Research Strategist",
+    why: "Your methodological training and decades of sociological thinking are exactly what makes you dangerous with AI. You already know how to design questions, evaluate evidence, and synthesise knowledge at depth. AI doesn't replace that — it accelerates it by a factor of ten. With the right tools, you can conduct literature reviews in hours instead of weeks, identify patterns across qualitative data sets, and produce sharper research outputs than most of your peers will manage in the next decade. This path also carries the highest consulting leverage: institutions need researchers who understand AI-augmented methodology, and very few exist yet.",
+    notRight: {
+      consulting: "Pure consulting requires building a client pipeline, which takes time and relationship investment. Your strongest near-term leverage is through research credibility first — which then opens consulting doors naturally.",
+      content: "Content creation works best when you already have a clear public voice and platform. Your academic authority is the asset — building research credibility first makes your public voice far more powerful when you eventually choose to use it.",
+      tools: "Tool-building as a primary path requires sustained technical practice. Your highest-leverage skill is analytical thinking, not tool configuration — AI augments your thinking; it doesn't need to become a technical pursuit."
+    },
+    curriculum: [
+      {
+        month: "Month 1",
+        theme: "Foundation & First Wins",
+        focus: "Core AI tools · Research workflows",
+        weeks: [
+          { n: "Week 1", title: "What AI Actually Is", desc: "Conceptual foundations without hype — how LLMs work, what they can and cannot do", deliverable: "Written reflection", del: "Workshop output" },
+          { n: "Week 2", title: "Your First Research Tool", desc: "ChatGPT and Perplexity for literature discovery and summarisation", deliverable: "AI-assisted literature map on a research topic you choose", del: "Live practice" },
+          { n: "Week 3", title: "Prompt Engineering for Researchers", desc: "How to talk to AI as a methodologist — precision, framing, iteration", deliverable: "Custom prompt library for your research tasks", del: "Deliverable" },
+          { n: "Week 4", title: "AI-Augmented Writing", desc: "Using AI to draft, refine, and structure academic writing without losing your voice", deliverable: "One AI-assisted section of a real paper or proposal", del: "Deliverable" }
+        ]
+      },
+      {
+        month: "Month 2",
+        theme: "Advanced Application",
+        focus: "Qualitative analysis · Research design · Positioning",
+        weeks: [
+          { n: "Week 5", title: "Qualitative Research with AI", desc: "Coding, thematic analysis, and pattern recognition across texts using AI tools", deliverable: "Demonstration analysis on existing data", del: "Live practice" },
+          { n: "Week 6", title: "AI for Research Proposals", desc: "Grant writing, funding arguments, and proposal structure with AI assistance", deliverable: "AI-supported proposal outline in your area", del: "Deliverable" },
+          { n: "Week 7", title: "Your Expert Positioning", desc: "Defining your niche: 'AI-augmented social research' — what you offer and to whom", deliverable: "One-page positioning statement", del: "Strategy session" },
+          { n: "Week 8", title: "LinkedIn as a Research Platform", desc: "Establishing your presence, writing first posts, attracting the right audience", deliverable: "Three LinkedIn posts drafted and published", del: "Deliverable" }
+        ]
+      },
+      {
+        month: "Month 3",
+        theme: "Monetisation & Launch",
+        focus: "Consulting offer · Outreach · Independence",
+        weeks: [
+          { n: "Week 9", title: "Designing Your First Offer", desc: "The 'AI Research Readiness' consulting offer — scope, price, delivery", deliverable: "Offer document: what you do, for whom, at what price", del: "Deliverable" },
+          { n: "Week 10", title: "Outreach Strategy", desc: "How to approach institutions, funders, and colleagues — without feeling salesy", deliverable: "10 personalised outreach messages drafted", del: "Strategy session" },
+          { n: "Week 11", title: "Workshop Design", desc: "Building a 2-hour 'AI for Researchers' workshop you can deliver and charge for", deliverable: "Workshop deck and facilitator notes", del: "Deliverable" },
+          { n: "Week 12", title: "Review, Refinement & Next Steps", desc: "What you've built, what works, and your 90-day independent roadmap", deliverable: "Your personal AI practice plan — post-programme", del: "Strategy session" }
+        ]
+      }
+    ],
+    outcomes: [
+      "Use AI to conduct literature reviews in a fraction of the usual time",
+      "Design and run AI-augmented qualitative analysis on real data",
+      "Write stronger, faster research proposals with AI co-authorship",
+      "Define and package a clear consulting offer based on your expertise",
+      "Publish your first AI-literacy content and begin building a public voice"
+    ],
+    outcomes90: [
+      "A live AI-augmented research workflow you use every single week",
+      "One published thought piece positioning you as an AI-literate academic",
+      "A consulting offer — 'AI Research Readiness' — priced and ready to pitch",
+      "10 outreach messages sent to real institutions or research colleagues"
+    ]
+  },
+  consulting: {
+    name: "AI Transformation Consultant",
+    short: "AI Transformation Consultant",
+    why: "You have spent decades understanding how institutions actually work — not how they say they work, but how decisions get made, where resistance lives, and what it takes to change embedded behaviour. That is exactly the skill gap in every AI transformation project. Organisations are not short of AI tools. They are desperately short of people who understand human systems well enough to help those tools actually get adopted. Your sociology background is not incidental to this path — it is the entire differentiator. An AI consultant with a social scientist's eye is rare. That rarity is where your consulting leverage lives.",
+    notRight: {
+      research: "Academic publishing cycles are long, and the financial returns come slowly. Your consulting skills are ready to deploy now — research can remain a companion activity, not the primary track.",
+      content: "Content works well as a top-of-funnel activity for consultants, but building it as your primary identity requires sustained publishing over 6–12 months before meaningful returns appear. Consulting generates income faster.",
+      tools: "Deep technical tool-building is a different skill set. You don't need to build tools — you need to help organisations decide which tools to adopt and how to change around them. That is your natural role."
+    },
+    curriculum: [
+      {
+        month: "Month 1",
+        theme: "AI Foundations for Consultants",
+        focus: "What AI is · How organisations misuse it · Your positioning",
+        weeks: [
+          { n: "Week 1", title: "How AI Actually Works", desc: "Conceptual fluency — enough to advise with confidence, not to code", deliverable: "Written summary: what you now understand about AI", del: "Workshop output" },
+          { n: "Week 2", title: "AI in Organisations — What's Really Happening", desc: "Why most AI transformations fail, and the sociological reasons why", deliverable: "Case study analysis of one real organisation", del: "Analysis" },
+          { n: "Week 3", title: "Your Consulting Lens", desc: "Defining your specific POV: what you see that generic consultants miss", deliverable: "One-page positioning statement", del: "Strategy session" },
+          { n: "Week 4", title: "Prompt Engineering for Consultants", desc: "Using AI to accelerate your own consulting work — research, decks, proposals", deliverable: "Custom prompt toolkit for consulting tasks", del: "Deliverable" }
+        ]
+      },
+      {
+        month: "Month 2",
+        theme: "Methodology & Offer Design",
+        focus: "Your process · Deliverables · Pricing",
+        weeks: [
+          { n: "Week 5", title: "Your Transformation Framework", desc: "Building a repeatable consulting methodology you can explain in one page", deliverable: "Your methodology document — draft one", del: "Deliverable" },
+          { n: "Week 6", title: "Case Study Construction", desc: "Turning your career history into consulting proof — without fabricating anything", deliverable: "Two case studies drawn from your real experience", del: "Deliverable" },
+          { n: "Week 7", title: "Pricing Your Expertise", desc: "How consultants in your niche price, and how to anchor confidently", deliverable: "Your pricing structure and service tiers", del: "Strategy session" },
+          { n: "Week 8", title: "LinkedIn Presence", desc: "Establishing your consulting voice — thought leadership that attracts clients", deliverable: "Three LinkedIn posts drafted and published", del: "Deliverable" }
+        ]
+      },
+      {
+        month: "Month 3",
+        theme: "Market Entry & First Clients",
+        focus: "Outreach · Proposals · First engagement",
+        weeks: [
+          { n: "Week 9", title: "Identifying Your First Clients", desc: "Who to approach, where to find them, how to frame the conversation", deliverable: "Target list of 15 potential first clients", del: "Strategy session" },
+          { n: "Week 10", title: "Proposal Writing with AI", desc: "Building consulting proposals that are specific, credible, and compelling", deliverable: "One complete consulting proposal draft", del: "Deliverable" },
+          { n: "Week 11", title: "Workshop Design", desc: "A 'AI Readiness Diagnostic' workshop — your entry-level offer", deliverable: "Workshop outline, deck, and pricing", del: "Deliverable" },
+          { n: "Week 12", title: "Review & 90-Day Roadmap", desc: "What you've built, your first client conversations, independent next steps", deliverable: "Your personal consulting launch plan", del: "Strategy session" }
+        ]
+      }
+    ],
+    outcomes: [
+      "Diagnose how an organisation is misusing or underusing AI with a structured framework",
+      "Design and facilitate an AI transformation workshop for real clients",
+      "Package your sociological expertise as a defined, priced consulting offer",
+      "Write compelling consulting proposals using AI assistance",
+      "Generate your first consulting inquiry through thought leadership and outreach"
+    ],
+    outcomes90: [
+      "A defined consulting methodology you can explain in one clear page",
+      "Two case studies from your career — built and ready to show clients",
+      "A consulting proposal template tested and refined",
+      "10 personalised outreach messages sent to real potential clients"
+    ]
+  },
+  content: {
+    name: "AI Public Intellectual",
+    short: "AI Public Intellectual",
+    why: "You have spent your career producing ideas that deserve wider audiences than academic journals allow. AI is the largest social transformation of the 21st century — and the conversation is being dominated by technologists who cannot explain it socially, politically, or humanly. A sociologist who can write clearly about what AI means for institutions, inequality, labour, and everyday life has a genuinely rare public contribution to make. This path combines your lifetime of analytical training with AI tools that let you produce, distribute, and amplify your thinking faster and more widely than ever before.",
+    notRight: {
+      research: "Academic publishing moves slowly and rewards a narrow audience. Your insights deserve to reach the people actually navigating AI — not just researchers who already know what you know.",
+      consulting: "Consulting requires active client work and relationship-building. This path suits you better if you want to build influence at scale through ideas rather than one-to-one engagements.",
+      tools: "Technical tool-building is a separate craft. Your comparative advantage is analytical thinking and clear expression — AI tools serve that; they don't need to become your primary focus."
+    },
+    curriculum: [
+      {
+        month: "Month 1",
+        theme: "Voice & Foundation",
+        focus: "AI literacy · Your niche · First content",
+        weeks: [
+          { n: "Week 1", title: "AI Foundations for Communicators", desc: "What you need to understand — and what misconceptions to avoid", deliverable: "Written explainer for a non-technical audience", del: "Deliverable" },
+          { n: "Week 2", title: "Finding Your Content Niche", desc: "AI + social science — defining the specific angle only you can own", deliverable: "Your content niche statement", del: "Strategy session" },
+          { n: "Week 3", title: "Writing with AI", desc: "Using AI to draft, sharpen, and restructure your thinking — without losing your voice", deliverable: "One fully AI-assisted article in your voice", del: "Deliverable" },
+          { n: "Week 4", title: "LinkedIn as Your Platform", desc: "Building presence — format, frequency, and what resonates for thought leaders", deliverable: "Three LinkedIn posts published", del: "Deliverable" }
+        ]
+      },
+      {
+        month: "Month 2",
+        theme: "Content Production System",
+        focus: "Format variety · Workflow · Audience building",
+        weeks: [
+          { n: "Week 5", title: "Long-Form Content", desc: "Writing essays and articles for platforms like Substack or Medium", deliverable: "First long-form essay published", del: "Deliverable" },
+          { n: "Week 6", title: "Speaking and Video", desc: "Using AI to script and structure talks, podcasts, or short videos", deliverable: "One recorded short video or audio piece", del: "Deliverable" },
+          { n: "Week 7", title: "Content Strategy", desc: "Building a 90-day content calendar you can sustain independently", deliverable: "Your 90-day content plan", del: "Strategy session" },
+          { n: "Week 8", title: "Repurposing Your Archive", desc: "Turning past research and writing into accessible public content", deliverable: "Three repurposed pieces from your existing work", del: "Deliverable" }
+        ]
+      },
+      {
+        month: "Month 3",
+        theme: "Monetisation & Reach",
+        focus: "Revenue pathways · Speaking · Independence",
+        weeks: [
+          { n: "Week 9", title: "Monetisation Options", desc: "Speaking engagements, paid newsletters, advisory, digital products", deliverable: "Your monetisation pathway — mapped and prioritised", del: "Strategy session" },
+          { n: "Week 10", title: "Speaking Proposals", desc: "Crafting conference and event pitches that actually get accepted", deliverable: "Two speaking proposals drafted", del: "Deliverable" },
+          { n: "Week 11", title: "Building Your Email List", desc: "Why email matters more than followers, and how to start building yours", deliverable: "Newsletter set up and first issue drafted", del: "Deliverable" },
+          { n: "Week 12", title: "Review & Next Steps", desc: "What you've built, what's working, your independent publishing roadmap", deliverable: "Your 90-day independent content plan", del: "Strategy session" }
+        ]
+      }
+    ],
+    outcomes: [
+      "Produce written and spoken content on AI regularly using AI tools",
+      "Build a recognisable voice in the AI + social science space",
+      "Convert your academic expertise into accessible, engaging public content",
+      "Design a simple monetisation pathway for your content and ideas",
+      "Develop a 90-day content calendar and publishing system you own completely"
+    ],
+    outcomes90: [
+      "12 pieces of published content across LinkedIn and one other platform",
+      "A defined content niche — AI through the lens of social science — that is recognisably yours",
+      "A simple monetisation pathway mapped: speaking, advisory, or digital product",
+      "A 90-day content calendar you can run fully independently"
+    ]
+  },
+  tools: {
+    name: "AI Systems & Research Strategist",
+    short: "AI Systems Strategist",
+    why: "Your appetite for efficiency and practical application means you are likely to get more from AI than most academics, simply because you are willing to actually use it rather than theorise about it. This path focuses on embedding AI tools deeply into your research and professional workflow — and then leveraging that fluency as a service you can offer to colleagues, departments, and institutions. The 'AI Research Systems' advisor who can help a team actually set up working tools is in short supply and high demand.",
+    notRight: {
+      research: "Pure research publishing alone carries long timelines for financial return. Your practical orientation is better served by building deployable systems that generate faster, visible results.",
+      consulting: "Macro transformation consulting requires building a client pipeline over time. Starting with concrete tools advisory lets you demonstrate value immediately and build toward broader engagements.",
+      content: "Content creation suits those with a strong drive to publish publicly. Your energy is better directed toward building practical systems that others can see and use — which is its own form of influence."
+    },
+    curriculum: [
+      {
+        month: "Month 1",
+        theme: "AI Tool Fluency",
+        focus: "Core tools · Research automation · First systems",
+        weeks: [
+          { n: "Week 1", title: "The AI Tool Landscape", desc: "What exists, what works, what is hype — a practical overview", deliverable: "Your personal AI tool shortlist", del: "Workshop output" },
+          { n: "Week 2", title: "Research Automation Tools", desc: "Perplexity, Consensus, Elicit — AI for literature and evidence work", deliverable: "AI-assisted literature review on a topic of your choice", del: "Live practice" },
+          { n: "Week 3", title: "Writing and Production Tools", desc: "Claude, ChatGPT, Notion AI — using AI across your content pipeline", deliverable: "One AI-drafted report or proposal section", del: "Deliverable" },
+          { n: "Week 4", title: "Workflow Design", desc: "Mapping your actual work and finding where AI saves the most time", deliverable: "Your personal AI workflow map", del: "Strategy session" }
+        ]
+      },
+      {
+        month: "Month 2",
+        theme: "Building & Deploying",
+        focus: "Systems design · Tool advisory · Positioning",
+        weeks: [
+          { n: "Week 5", title: "Custom AI Workflows", desc: "Building repeatable systems: research pipelines, writing flows, analysis routines", deliverable: "One working automated workflow live", del: "Deliverable" },
+          { n: "Week 6", title: "AI for Qualitative Research", desc: "Thematic analysis, coding, and interpretation with AI tools", deliverable: "Demonstration analysis using real data", del: "Live practice" },
+          { n: "Week 7", title: "Your Tools Advisory Offer", desc: "Packaging what you know as a service — 'AI Tools Setup for Researchers'", deliverable: "Service offer document with pricing", del: "Deliverable" },
+          { n: "Week 8", title: "LinkedIn Positioning", desc: "Establishing your practical AI identity — posts that attract colleagues and institutions", deliverable: "Three LinkedIn posts published", del: "Deliverable" }
+        ]
+      },
+      {
+        month: "Month 3",
+        theme: "Service Launch",
+        focus: "Workshop design · Clients · Independence",
+        weeks: [
+          { n: "Week 9", title: "Workshop Design", desc: "A 'Practical AI for Researchers' workshop — your first billable group offer", deliverable: "Workshop deck, facilitator notes, pricing", del: "Deliverable" },
+          { n: "Week 10", title: "First Client Outreach", desc: "Who needs what you know, and how to have the first conversation", deliverable: "10 outreach messages drafted and sent", del: "Strategy session" },
+          { n: "Week 11", title: "Demonstration Content", desc: "Creating content that shows (not just tells) what AI can do for researchers", deliverable: "One demo piece or case study published", del: "Deliverable" },
+          { n: "Week 12", title: "Review & 90-Day Roadmap", desc: "What you've built and your independent next steps", deliverable: "Your personal AI practice and service plan", del: "Strategy session" }
+        ]
+      }
+    ],
+    outcomes: [
+      "Use 8–10 AI tools fluently across writing, research, and analysis",
+      "Design and deploy working AI workflows that save real time weekly",
+      "Train non-technical colleagues on practical AI tool adoption",
+      "Package your knowledge as a paid tools advisory or workshop service",
+      "Prototype a simple AI-assisted research or writing system for others"
+    ],
+    outcomes90: [
+      "8–10 AI tools used fluently across your own research and writing",
+      "One working automated workflow live and saving you time weekly",
+      "A tools advisory or training service — defined, priced, and ready to offer",
+      "Your first AI tools workshop deck — built and ready to deliver"
+    ]
+  }
+};
+
+function computeProfile() {
+  const scores = { research: 0, consulting: 0, content: 0, tools: 0 };
+  let bandwidth = 'medium';
+
+  answers.forEach((ans, i) => {
+    if (ans === null || questions[i].type === 'open') return;
+    const opt = questions[i].options[ans];
+    if (!opt) return;
+    opt.tags.forEach(tag => {
+      if (scores.hasOwnProperty(tag)) scores[tag]++;
+      if (tag === 'high-bandwidth') bandwidth = 'high';
+      if (tag === 'low-bandwidth') bandwidth = 'low';
+    });
+  });
+
+  const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+  return {
+    primary: sorted[0][0],
+    secondary: sorted[1][0],
+    scores,
+    bandwidth
+  };
+}
+
+function computeReadiness() {
+  const aiTags = { 'no-prior-ai': 20, 'low-prior-ai': 40, 'some-prior-ai': 65, 'strong-prior-ai': 85 };
+  const techTags = { 'beginner': 20, 'intermediate': 55, 'fast-learner': 70, 'advanced': 90 };
+  let aiScore = 30, techScore = 40;
+  answers.forEach((ans, i) => {
+    if (ans === null || questions[i].type === 'open') return;
+    const opt = questions[i].options?.[ans];
+    if (!opt) return;
+    opt.tags.forEach(t => {
+      if (aiTags[t]) aiScore = aiTags[t];
+      if (techTags[t]) techScore = techTags[t];
+    });
+  });
+  return Math.round((aiScore * 0.5) + (techScore * 0.5));
+}
+
+function startQuiz() {
+  document.getElementById('screen-intro').style.display = 'none';
+  document.getElementById('screen-quiz').style.display = 'block';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = questions[current];
+  const container = document.getElementById('question-container');
+  container.style.animation = 'none';
+  container.offsetHeight;
+  container.style.animation = 'fadeUp 0.35s ease forwards';
+
+  let html = `<p class="q-section">${q.section}</p><p class="q-text">${q.text}</p>`;
+
+  if (q.type === 'open') {
+    const saved = answers[current] || '';
+    html += `<textarea class="open-textarea" id="open-answer" placeholder="${q.placeholder}" oninput="handleOpen(this.value)">${saved}</textarea>`;
+  } else {
+    html += `<div class="options-list">`;
+    q.options.forEach((opt, i) => {
+      const sel = answers[current] === i ? 'selected' : '';
+      html += `
+        <div class="opt-item ${sel}" onclick="selectOption(${i})">
+          <span class="opt-letter">${String.fromCharCode(65 + i)}</span>
+          <div class="opt-content">
+            <p class="opt-label">${opt.label}</p>
+            <p class="opt-sub">${opt.sub}</p>
+          </div>
+        </div>`;
+    });
+    html += `</div>`;
+  }
+
+  container.innerHTML = html;
+
+  document.getElementById('progress-count').textContent = `${current + 1} of ${questions.length}`;
+  document.getElementById('progress-fill').style.width = `${((current + 1) / questions.length) * 100}%`;
+  document.getElementById('btn-back').disabled = current === 0;
+
+  const nextBtn = document.getElementById('btn-next');
+  const answered = answers[current] !== null;
+  nextBtn.classList.toggle('active', answered);
+  nextBtn.textContent = current === questions.length - 1 ? 'See My Results →' : 'Next →';
+}
+
+function selectOption(i) {
+  answers[current] = i;
+  document.querySelectorAll('.opt-item').forEach((el, idx) => {
+    el.classList.toggle('selected', idx === i);
+  });
+  document.getElementById('btn-next').classList.add('active');
+}
+
+function handleOpen(val) {
+  answers[current] = val.trim().length > 0 ? val : null;
+  document.getElementById('btn-next').classList.toggle('active', val.trim().length > 0);
+}
+
+function nextQuestion() {
+  if (answers[current] === null) return;
+  if (current === questions.length - 1) {
+    showResult();
+    return;
+  }
+  current++;
+  renderQuestion();
+}
+
+function prevQuestion() {
+  if (current === 0) return;
+  current--;
+  renderQuestion();
+}
+
+function buildCurriculumHTML(primary) {
+  const data = specialtyMap[primary];
+  return data.curriculum.map(m => `
+    <div class="month-block">
+      <div class="month-header">
+        <span class="month-pill">${m.month}</span>
+        <div>
+          <p class="month-theme">${m.theme}</p>
+          <p class="month-focus">${m.focus}</p>
+        </div>
+      </div>
+      <ul class="week-list">
+        ${m.weeks.map(w => `
+          <li class="week-item">
+            <span class="week-num">${w.n}</span>
+            <div class="week-content">
+              <strong>${w.title}</strong>
+              <span>${w.desc}</span>
+              <div class="deliverable-row">
+                <span class="deliverable-tag">${w.del}</span>
+                <span class="deliverable-text">${w.deliverable}</span>
+              </div>
+            </div>
+          </li>
+        `).join('')}
+      </ul>
+    </div>
+  `).join('');
+}
+
+function buildWAMessage(primary, secondary, readiness, openAnswer) {
+  const pri = specialtyMap[primary];
+  const sec = specialtyMap[secondary];
+  const profile = computeProfile();
+  const bwMap = { high: 'High (3–5 hrs/week)', medium: 'Moderate (1–2 hrs/week)', low: 'Minimal (Sundays only)' };
+
+  let msg = `🎯 *AI PATHWAY ASSESSMENT RESULTS*\n\n`;
+  msg += `*Primary Specialty:* ${pri.name}\n`;
+  msg += `*Secondary Path:* ${sec.name}\n`;
+  msg += `*AI Readiness Score:* ${readiness}%\n`;
+  msg += `*Weekly Bandwidth:* ${bwMap[profile.bandwidth] || 'Moderate'}\n\n`;
+
+  msg += `📊 *SPECIALTY SCORES*\n`;
+  msg += `Research: ${profile.scores.research} pts\n`;
+  msg += `Consulting: ${profile.scores.consulting} pts\n`;
+  msg += `Content: ${profile.scores.content} pts\n`;
+  msg += `Tools: ${profile.scores.tools} pts\n\n`;
+
+  if (openAnswer) {
+    msg += `💬 *OPEN REFLECTION*\n"${openAnswer}"\n\n`;
+  }
+
+  msg += `✅ *90-DAY TARGETS*\n`;
+  pri.outcomes90.forEach((o, i) => { msg += `${i+1}. ${o}\n`; });
+
+  msg += `\n📋 *CURRICULUM OVERVIEW*\n`;
+  pri.curriculum.forEach(m => {
+    msg += `\n*${m.month} — ${m.theme}*\n`;
+    m.weeks.forEach(w => { msg += `• ${w.n}: ${w.title}\n`; });
+  });
+
+  return encodeURIComponent(msg);
+}
+
+function showResult() {
+  document.getElementById('screen-quiz').style.display = 'none';
+  const resultEl = document.getElementById('screen-result');
+  resultEl.style.display = 'block';
+
+  const { primary, secondary, bandwidth } = computeProfile();
+  const pri = specialtyMap[primary];
+  const sec = specialtyMap[secondary];
+  const readiness = computeReadiness();
+  const readinessLabel = readiness >= 70 ? 'Ready to accelerate' : readiness >= 45 ? 'Ready to begin' : 'Starting position — strong foundation ahead';
+  const openAnswer = answers[questions.length - 1] || null;
+
+  const curriculumHTML = buildCurriculumHTML(primary);
+  const waMsg = buildWAMessage(primary, secondary, readiness, openAnswer);
+
+  const styleMap = { research: 'Conceptual & evidence-first', consulting: 'Applied & systems-oriented', content: 'Expressive & observational', tools: 'Practical & efficiency-driven' };
+  const strengthMap = { research: 'Methodological rigour, synthesis', consulting: 'Institutional analysis, change', content: 'Knowledge translation, communication', tools: 'Process optimisation, rapid adoption' };
+  const paceMap = { high: 'Accelerated — ready to move fast', medium: 'Standard — one concept per session', low: 'Deliberate — depth over speed' };
+
+  resultEl.innerHTML = `
+    <div class="result-header fade-up">
+      <p class="result-eyebrow">Your AI Learner Profile</p>
+      <h1 class="result-title">Your path is <em>${pri.name}</em></h1>
+    </div>
+
+    <div class="readiness-row">
+      <span class="readiness-label">AI Readiness</span>
+      <div class="readiness-bar"><div class="readiness-fill" id="readiness-fill"></div></div>
+      <span class="readiness-score">${readiness}% — ${readinessLabel}</span>
+    </div>
+
+    <div class="profile-grid">
+      <div class="profile-card">
+        <p class="profile-card-label">Learning Style</p>
+        <p class="profile-card-value">${styleMap[primary] || '—'}</p>
+      </div>
+      <div class="profile-card">
+        <p class="profile-card-label">Programme Format</p>
+        <p class="profile-card-value">Live 1-on-1 · Sundays · 3 months</p>
+      </div>
+      <div class="profile-card">
+        <p class="profile-card-label">Primary Strength</p>
+        <p class="profile-card-value">${strengthMap[primary] || '—'}</p>
+      </div>
+      <div class="profile-card">
+        <p class="profile-card-label">Recommended Pace</p>
+        <p class="profile-card-value">${paceMap[bandwidth] || 'Standard'}</p>
+      </div>
+    </div>
+
+    <div class="specialty-block">
+      <p class="specialty-name">${pri.name}</p>
+      <p class="specialty-why">${pri.why}</p>
+    </div>
+
+    <div class="secondary-block">
+      <p class="secondary-label">Secondary Path — Supports Your Primary</p>
+      <p class="secondary-name">${sec.name}</p>
+      <p class="secondary-why">${sec.why.substring(0, 220)}...</p>
+    </div>
+
+    <div style="margin-bottom:28px;padding:20px 22px;background:var(--white);border:1px solid var(--border);">
+      <p style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;">Why the other paths are not your priority right now</p>
+      <div>
+        ${Object.entries(pri.notRight).map(([key, text]) => `
+          <div style="padding-bottom:12px;margin-bottom:12px;border-bottom:1px solid var(--cream);">
+            <p style="font-size:12px;font-weight:600;color:var(--ink);margin-bottom:3px;">${specialtyMap[key]?.name || key}</p>
+            <p style="font-size:13px;color:var(--muted);line-height:1.55;">${text}</p>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="curriculum-section">
+      <p class="section-eyebrow">Your Personalised 12-Week Programme</p>
+      <h3 class="section-title">${pri.short} — Curriculum</h3>
+      ${curriculumHTML}
+    </div>
+
+    <hr class="divider">
+
+    <div>
+      <p class="section-eyebrow">By end of Week 12</p>
+      <h3 class="section-title" style="margin-bottom:12px;">You will be able to…</h3>
+      <div class="outcomes-list">
+        ${pri.outcomes.map(o => `
+          <div class="outcome-item"><div class="outcome-dot"></div><span>${o}</span></div>
+        `).join('')}
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <div>
+      <p class="section-eyebrow">Concrete targets by Day 90</p>
+      <h3 class="section-title" style="margin-bottom:12px;">Your 90-day milestones</h3>
+      <div style="display:grid;gap:10px;">
+        ${pri.outcomes90.map((o, i) => `
+          <div style="display:flex;gap:12px;align-items:flex-start;font-size:13.5px;line-height:1.5;">
+            <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);min-width:22px;padding-top:2px;">${i+1}.</span>
+            <span style="color:var(--ink);font-weight:500;">${o}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="wa-section">
+      <p class="wa-section-label">Send your results</p>
+      <p>Your personalised profile and full 12-week curriculum are ready. Tap below to send your results directly — your tutor will review them and reach out to discuss the next step.</p>
+      <a class="btn-whatsapp" href="https://wa.me/${WA_NUMBER}?text=${waMsg}" target="_blank">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Send Results on WhatsApp
+      </a>
+    </div>
+
+    <button class="btn-restart" onclick="restartQuiz()">← Retake Assessment</button>
+    <p class="print-hint">Tip: Ctrl+P / Cmd+P to save this profile as a PDF.</p>
+  `;
+
+  setTimeout(() => {
+    const fill = document.getElementById('readiness-fill');
+    if (fill) fill.style.width = readiness + '%';
+  }, 300);
+}
+
+function restartQuiz() {
+  current = 0;
+  answers = new Array(questions.length).fill(null);
+  document.getElementById('screen-result').style.display = 'none';
+  document.getElementById('screen-intro').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
